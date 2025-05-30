@@ -5,7 +5,8 @@ from wtforms import TextAreaField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
 from wtforms.validators import Length
 from pymongo import MongoClient
-import os, request
+import os
+import requests
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,9 +29,9 @@ class MessageForm(FlaskForm):
 def edit_profile():
     form = MessageForm()
     if form.validate_on_submit():
-        form.username.data =  request.form['name']  # Retrieve 'name' input
-        form.email.data =  request.form['email']  # Retrieve 'email' input
-        form.message.data  = request.form['message'] # Retrieve 'message' input
+        form.username.data =  requests.form['name']  # Retrieve 'name' input
+        form.email.data =  requests.form['email']  # Retrieve 'email' input
+        form.message.data  = requests.form['message'] # Retrieve 'message' input
         
         message_data = {
             "username": form.username.data,
