@@ -1,4 +1,14 @@
-import sqlalchemy as sa
-import sqlalchemy.orm as so
-from app import app
-from app import db
+from flask import Flask, render_template
+
+
+app = Flask(__name__)
+
+@app.route('/')
+@app.route('/index')
+def index():
+    return render_template('landing-freelancer.html')
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
+
+    
