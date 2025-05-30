@@ -17,8 +17,8 @@ class MessageForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired() ])
     message = TextAreaField('Message', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')
-
-@app.route('/index', methods=['GET', 'POST'])
+@app.route('/', methods =  ['GET', 'POST'])
+@app.route('/index', methods = ['GET', 'POST'])
 def index():
     form = MessageForm()  
     if form.validate_on_submit():
