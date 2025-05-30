@@ -6,7 +6,7 @@ app = Flask(__name__)
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('landing-freelancer.html')
+    return render_template('landing-freelancer.html', title='YoTag')
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
