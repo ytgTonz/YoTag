@@ -1,56 +1,58 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request, flash, redirect, url_for
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField
+from wtforms import StringField, SubmitField
 from wtforms import TextAreaField
-from wtforms.validators import ValidationError, DataRequired, Email, EqualTo
-from wtforms.validators import Length
+from wtforms.validators import DataRequired, Length
 from pymongo import MongoClient
 import os
-import requests
 from dotenv import load_dotenv
 
 load_dotenv()
 
 app = Flask(__name__)
-
-@app.route('/')
-@app.route('/index')
-def index():
-    return render_template('landing-freelancer.html', title='YoTag')
+app.config['SECRET_KEY'] = 'your-secret-key-here'
 
 class MessageForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
-    email = StringField('Email', validators=[DataRequired(), Email()])
+    email = StringField('Email', validators=[DataRequired() ])
     message = TextAreaField('Message', validators=[Length(min=0, max=140)])
     submit = SubmitField('Submit')
 
-
-
-def edit_profile():
-    form = MessageForm()
+@app.route('/index', methods=['GET', 'POST'])
+def index():
+    form = MessageForm()  
     if form.validate_on_submit():
-        form.username.data =  requests.form['name']  # Retrieve 'name' input
-        form.email.data =  requests.form['email']  # Retrieve 'email' input
-        form.message.data  = requests.form['message'] # Retrieve 'message' input
-        
-        message_data = {
-            "username": form.username.data,
-            "email": form.email.data,
-            "message": form.message.data
-        }
-        collection.insert_one(message_data)
-        print("Report saved to MongoDB Atlas")
-    return render_template('landing-freelancer.html', title='YoTag', form=form)
-    
+        username = form.username.data
+        email = form.email.data
+        message = form.message.data
 
+        contact_data = {
+            "username": username,
+            "email": email,
+            "message": message
+        }
+        collection.insert_one(contact_data)
+        print("DATA IS CAPUTRED AND SAVED TO MONGODB")
+    else:
+        flash("Your message has not been sent!")
+    
+    return render_template('landing-freelancer.html', title='YoTag', form=form)
 
 # MongoDB Atlas connection
 MONGO_URI = os.getenv("MONGO_URI")
-client = MongoClient(MONGO_URI)
-db = client["clientlist"]
-collection = db["contacts"]
+if not MONGO_URI:
+    raise ValueError("No MONGO_URI environment variable found")
 
-    
+try:
+    client = MongoClient(MONGO_URI)
+    # Verify connection
+    client.server_info()
+    db = client["clientlist"]
+    collection = db["contacts"]
+    print("Successfully connected to MongoDB")
+except Exception as e:
+    print(f"Error connecting to MongoDB: {e}")
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
 
